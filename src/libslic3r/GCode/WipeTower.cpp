@@ -669,8 +669,7 @@ std::vector<WipeTower::ToolChangeResult> WipeTower::prime(
                   .append(";--------------------\n")
                   .speed_override_backup()
                   .speed_override(100)
-                  .set_initial_position(Vec2f::Zero())	// Always move to the starting position
-                  .travel(cleaning_box.ld, 7200);
+                  .set_initial_position(cleaning_box.ld);	// Always move to the starting position
             if (m_set_extruder_trimpot)
                 writer.set_extruder_trimpot(750); 			// Increase the extruder driver current to allow fast ramming.
         }
@@ -972,9 +971,12 @@ void WipeTower::toolchange_Change(
     // gcode could have left the extruder somewhere, we cannot just start extruding. We should also inform the
     // postprocessor that we absolutely want to have this in the gcode, even if it thought it is the same as before.
     Vec2f current_pos = writer.pos_rotated();
-    writer.feedrate(m_travel_speed * 60.f) // see https://github.com/prusa3d/PrusaSlicer/issues/5483
-          .append(std::string("G1 X") + Slic3r::float_to_string_decimal_point(current_pos.x())
+    // writer.feedrate(m_travel_speed * 60.f) // see https://github.com/prusa3d/PrusaSlicer/issues/5483
+    writer.append(std::string("G1 F") + Slic3r::float_to_string_decimal_point(m_travel_speed * 60.f, 0)
+                             +  " X"  + Slic3r::float_to_string_decimal_point(current_pos.x())
                              +  " Y"  + Slic3r::float_to_string_decimal_point(current_pos.y())
+                             + never_skip_tag() + "\n")
+          .append(std::string("G1 Z") + Slic3r::float_to_string_decimal_point(m_z_pos)
                              + never_skip_tag() + "\n");
     writer.append("[deretraction_from_wipe_tower_generator]");
 

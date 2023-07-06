@@ -241,6 +241,9 @@ std::string GCodeWriter::toolchange(unsigned int extruder_id)
             gcode << " ; change extruder";
         gcode << "\n";
         gcode << this->reset_e(true);
+
+        // set indicator to mandate emitting the z coordinate
+        m_should_emit_z_coord = true;
     }
     return gcode.str();
 }
@@ -261,10 +264,10 @@ std::string GCodeWriter::travel_to_xy(const Vec2d &point, const std::string &com
 {
     m_pos.x() = point.x();
     m_pos.y() = point.y();
-    
+
     GCodeG1Formatter w;
     w.emit_xy(point);
-    w.emit_f(this->config.travel_speed.value * 60.0);
+        w.emit_f(this->config.travel_speed.value * 60.0);
     w.emit_comment(this->config.gcode_comments, comment);
     return w.string();
 }
@@ -329,6 +332,8 @@ std::string GCodeWriter::_travel_to_z(double z, const std::string &comment)
     if (speed == 0.)
         speed = this->config.travel_speed.value;
     
+    m_should_emit_z_coord = false;
+
     GCodeG1Formatter w;
     w.emit_z(z);
     w.emit_f(speed * 60.0);

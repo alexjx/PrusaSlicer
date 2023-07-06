@@ -21,7 +21,7 @@ public:
         m_single_extruder_multi_material(false),
         m_last_acceleration(0), m_max_acceleration(0),
         m_last_bed_temperature(0), m_last_bed_temperature_reached(true), 
-        m_lifted(0)
+        m_lifted(0), m_should_emit_z_coord(false)
         {}
     Extruder*            extruder()             { return m_extruder; }
     const Extruder*      extruder()     const   { return m_extruder; }
@@ -107,6 +107,7 @@ private:
     bool            m_last_bed_temperature_reached;
     double          m_lifted;
     Vec3d           m_pos = Vec3d::Zero();
+    bool            m_should_emit_z_coord;
 
     enum class Acceleration {
         Travel,

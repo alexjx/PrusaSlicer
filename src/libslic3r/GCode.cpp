@@ -314,9 +314,16 @@ namespace Slic3r {
         Vec2f pos = tcr.start_pos;
         Vec2f transformed_pos = Eigen::Rotation2Df(angle) * pos + translation;
         Vec2f old_pos(-1000.1f, -1000.1f);
+        float pos_z = tcr.print_z;
+        float old_pos_z = -1000.1f;
 
         while (gcode_str) {
             std::getline(gcode_str, line);  // we read the gcode line by line
+
+            // we should not output X/Y if the original line did not contain it
+            bool has_x = false;
+            bool has_y = false;
+            bool has_z = false;
 
             // All G1 commands should be translated and rotated. X and Y coords are
             // only pushed to the output when they differ from last time.
@@ -335,10 +342,18 @@ namespace Slic3r {
                 char ch = 0;
                 line_str >> ch >> ch; // read the "G1"
                 while (line_str >> ch) {
-                    if (ch == 'X' || ch == 'Y')
+                    if (ch == 'X' || ch == 'Y') {
+                        if (ch == 'X')
+                            has_x = true;
+                        else
+                            has_y = true;
                         line_str >> (ch == 'X' ? pos.x() : pos.y());
-                    else
+                    } else if (ch == 'Z') {
+                        has_z = true;
+                        line_str >> pos_z;
+                    } else {
                         line_out << ch;
+                    }
                 }
 
                 transformed_pos = Eigen::Rotation2Df(angle) * pos + translation;
@@ -348,10 +363,12 @@ namespace Slic3r {
                     boost::trim_left(line); // Remove leading spaces
                     std::ostringstream oss;
                     oss << std::fixed << std::setprecision(3) << "G1";
-                    if (transformed_pos.x() != old_pos.x() || never_skip)
+                    if (has_x && (transformed_pos.x() != old_pos.x() || never_skip))
                         oss << " X" << transformed_pos.x() - extruder_offset.x();
-                    if (transformed_pos.y() != old_pos.y() || never_skip)
+                    if (has_y && (transformed_pos.y() != old_pos.y() || never_skip))
                         oss << " Y" << transformed_pos.y() - extruder_offset.y();
+                    if (has_z && (pos_z != old_pos_z || never_skip))
+                        oss << " Z" << pos_z;
                     if (! line.empty())
                         oss << " ";
                     line = oss.str() + line;
@@ -1398,7 +1415,8 @@ void GCode::_do_export(Print& print, GCodeOutputStream &file, ThumbnailsGenerato
         // Prusa Multi-Material wipe tower.
         if (has_wipe_tower && ! layers_to_print.empty()) {
             m_wipe_tower.reset(new WipeTowerIntegration(print.config(), *print.wipe_tower_data().priming.get(), print.wipe_tower_data().tool_changes, *print.wipe_tower_data().final_purge.get()));
-            file.write(m_writer.travel_to_z(first_layer_height + m_config.z_offset.value, "Move to the first layer height"));
+            // file.write(m_writer.travel_to_z(first_layer_height + m_config.z_offset.value, "Move to the first layer height"));
+            m_writer.travel_to_z(first_layer_height + m_config.z_offset.value, "Move to the first layer height"); // set the inital z pos but not write down
             if (print.config().single_extruder_multi_material_priming) {
                 file.write(m_wipe_tower->prime(*this));
                 // Verify, whether the print overaps the priming extrusions.
