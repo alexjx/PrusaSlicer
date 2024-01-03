@@ -43,7 +43,7 @@ jobs:
         run: |
           mkdir ${{ github.workspace }}\build
           cd ${{ github.workspace }}\build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local"
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\build\destdir"
           cmake --build . -j2 --config Release --target install
 
       - name: Package Build
