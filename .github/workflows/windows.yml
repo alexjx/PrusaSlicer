@@ -29,7 +29,7 @@ jobs:
           cmake --build . -j2
 
       - name: Save Deps Cache
-        id: cache-dpes-save
+        id: cache-deps-save
         if: steps.cache-deps.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
@@ -41,7 +41,7 @@ jobs:
         run: |
           mkdir ${{ github.workspace }}\build
           cd ${{ github.workspace }}\build
-          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local"
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local"
           cmake --build . -j2 --config Release --target install
 
       # - name: Package Build
