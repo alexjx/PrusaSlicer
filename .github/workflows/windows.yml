@@ -44,17 +44,17 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local"
           cmake --build . -j2 --config Release --target install
 
-      - name: Package Build
-        working-directory: ${{ github.workspace }}
-        run: |
-            # Create zip file
-            $zipPath = "${{ github.workspace }}\build\PrusaSlicer_${{ env.date }}.zip"
-            Compress-Archive -Path "${{ github.workspace }}\build\destdir" -DestinationPath $zipPath
-        shell: pwsh
+      # - name: Package Build
+      #   working-directory: ${{ github.workspace }}
+      #   run: |
+      #       # Create zip file
+      #       $zipPath = "${{ github.workspace }}\build\PrusaSlicer_${{ env.date }}.zip"
+      #       Compress-Archive -Path "${{ github.workspace }}\build\destdir" -DestinationPath $zipPath
+      #   shell: pwsh
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: PrusaSlicer_win64_${{ env.date }}
-          path: ${{ github.workspace }}/build/PrusaSlicer_*.zip
+          path: ${{ github.workspace }}/build/destdir
           retention-days: 5
