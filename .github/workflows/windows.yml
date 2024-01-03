@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir ${{ github.workspace }}\deps\build
           cd ${{ github.workspace }}\deps\build
-          cmake .. -DDEP_DEBUG=OFF
+          cmake ..
           cmake --build . -j2
 
       - name: Save Deps Cache
@@ -35,6 +35,14 @@ jobs:
         with:
           path: ${{ github.workspace }}/deps/build/destdir
           key: prusaslicer_deps_windows_2022
+
+      - name: Upload Deps Artifacts
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrusaSlicer_deps_win64_${{ env.date }}
+          path: ${{ github.workspace }}/deps/build/destdir
+          retention-days: 5
 
       - name: Build Slicer
         working-directory: ${{ github.workspace }}
