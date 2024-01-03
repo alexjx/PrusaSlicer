@@ -41,7 +41,7 @@ jobs:
         run: |
           mkdir ${{ github.workspace }}\build
           cd ${{ github.workspace }}\build
-          cmake .. -DSLIC3R_STATIC=1 -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local"
+          cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local"
           cmake --build . -j2 --config Release --target install
 
       - name: Package Build
