@@ -57,4 +57,4 @@ jobs:
         with:
           name: PrusaSlicer_win64_${{ env.date }}
           path: ${{ github.workspace }}/build/PrusaSlicer_${{ env.date }}.zip
-          retention-days: 5
+          retention-days: 1
