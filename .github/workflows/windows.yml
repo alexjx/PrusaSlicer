@@ -11,6 +11,8 @@ jobs:
 
       - name: Setup Env on Windows
         uses: microsoft/setup-msbuild@v1.1
+      - name: Setup MSVC Dev Cmd
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Restore Deps Cache
         id: cache-deps
