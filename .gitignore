@@ -1,6 +1,8 @@
 Build
 Build.bat
 /build/
+/build-default/
+/.devcontainer/
 MYMETA.json
 MYMETA.yml
 _build
@@ -22,3 +24,4 @@ deps/build-linux/*
 **/.idea/
 .pkg_cache
 CMakeUserPresets.json
+*.idx
