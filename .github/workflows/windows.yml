@@ -68,11 +68,8 @@ jobs:
           mkdir ${{ github.workspace }}\build
           cd ${{ github.workspace }}\build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\build\destdir"
-          cmake --build . -j2 --config Release --target PrusaSlicer
-          cmake --build . -j2 --config Release --target PrusaSlicer_app_gui
-          cmake --build . -j2 --config Release --target PrusaSlicer_app_console
-          cmake --build . -j2 --config Release --target PrusaSlicer_app_gcodeviewer
-          cmake --build . -j2 --config Release --target PrusaSlicerDllsCopy
+          cmake --build . -j2 --config Release --target install
+          dir ${{ github.workspace }}\build\destdir
 
       - name: Package Build
         working-directory: ${{ github.workspace }}
@@ -80,9 +77,10 @@ jobs:
             $date = Get-Date -Format "yyyyMMdd_HHmmss"
 
             # Copy dependency
-            # Copy-Item -force ${{ github.workspace }}\deps\build\destdir\usr\local\bin\*.dll ${{ github.workspace }}\build\destdir
-            # Move-Item -force ${{ github.workspace }}\build\destdir\bin\* ${{ github.workspace }}\build\destdir
-            # Remove-Item ${{ github.workspace }}\build\destdir\bin
+            Copy-Item -force ${{ github.workspace }}\deps\build\destdir\usr\local\bin\*.dll ${{ github.workspace }}\build\destdir
+            Move-Item -force ${{ github.workspace }}\build\destdir\bin\* ${{ github.workspace }}\build\destdir
+            Move-Item -force ${{ github.workspace }}\build\src\Release\*.bin ${{ github.workspace }}\build\destdir
+            Remove-Item ${{ github.workspace }}\build\destdir\bin
 
             # Create zip file
             $zipPath = "${{ github.workspace }}\build\PrusaSlicer_$date.zip"
