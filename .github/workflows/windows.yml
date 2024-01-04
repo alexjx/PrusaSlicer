@@ -25,7 +25,7 @@ jobs:
         id: cache-deps
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/deps/build/destdir
+          path: ${{ github.workspace }}\deps\build\destdir
           key: prusaslicer_deps_windows_2022
 
       - name: Build Deps
@@ -42,13 +42,18 @@ jobs:
         if: steps.cache-deps.outputs.cache-hit != 'true'
         uses: actions/cache/save@v3
         with:
-          path: ${{ github.workspace }}/deps/build/destdir
+          path: ${{ github.workspace }}\deps\build\destdir
           key: prusaslicer_deps_windows_2022
 
       - name: Package Deps
         working-directory: ${{ github.workspace }}
         run: |
             # Create zip file
+
+            ls -la ${{ github.workspace }}\deps
+            ls -la ${{ github.workspace }}\deps\build
+            ls -la ${{ github.workspace }}\deps\build\destdir\user\local
+
             $date = Get-Date -Format "yyyyMMdd_HHmmss"
             $zipPath = "${{ github.workspace }}\deps\build\PrusaSlicer_deps_$date.zip"
             Compress-Archive -Path "${{ github.workspace }}\deps\build\destdir\user\local" -DestinationPath $zipPath
