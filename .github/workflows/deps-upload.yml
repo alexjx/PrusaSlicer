@@ -22,7 +22,7 @@ jobs:
         id: cache-deps
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/deps/build/destdir
+          path: ${{ github.workspace }}\deps\build\destdir
           key: prusaslicer_deps_windows_2022
 
       - name: Package Deps
