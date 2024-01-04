@@ -1,4 +1,4 @@
-name: windows-build
+name: deps upload
 
 on:
   workflow_dispatch: {}
@@ -31,12 +31,12 @@ jobs:
             # Create zip file
             $date = Get-Date -Format "yyyyMMdd_HHmmss"
             $zipPath = "${{ github.workspace }}\build\PrusaSlicer_deps_$date.zip"
-            Compress-Archive -Path "${{ github.workspace }}\build\destdir" -DestinationPath $zipPath
+            Compress-Archive -Path "${{ github.workspace }}\deps\build\destdir" -DestinationPath $zipPath
         shell: pwsh
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: PrusaSlicer_win64_${{ github.run_number }}
+          name: PrusaSlicer_deps_win64_${{ github.run_number }}
           path: ${{ github.workspace }}\build\PrusaSlicer_deps_*.zip
           retention-days: 1
