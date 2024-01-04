@@ -1,4 +1,4 @@
-name: deps-build
+name: deps build
 
 on:
   workflow_dispatch: {}

@@ -31,7 +31,7 @@ jobs:
             # Create zip file
             $date = Get-Date -Format "yyyyMMdd_HHmmss"
             $zipPath = "${{ github.workspace }}\build\PrusaSlicer_deps_$date.zip"
-            Compress-Archive -Path "${{ github.workspace }}\deps\build\destdir" -DestinationPath $zipPath
+            Compress-Archive -Path "${{ github.workspace }}\deps\build\destdir\user\local\*" -DestinationPath $zipPath
         shell: pwsh
 
       - name: Upload Artifacts
