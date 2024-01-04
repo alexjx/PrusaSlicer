@@ -79,7 +79,7 @@ jobs:
             # Copy dependency
             Copy-Item -force ${{ github.workspace }}\deps\build\destdir\usr\local\bin\*.dll ${{ github.workspace }}\build\destdir
             Move-Item -force ${{ github.workspace }}\build\destdir\bin\* ${{ github.workspace }}\build\destdir
-            Move-Item -force ${{ github.workspace }}\build\src\Release\*.bin ${{ github.workspace }}\build\destdir
+            Move-Item -force ${{ github.workspace }}\build\src\Release\*.exe ${{ github.workspace }}\build\destdir
             Remove-Item ${{ github.workspace }}\build\destdir\bin
 
             # Create zip file
