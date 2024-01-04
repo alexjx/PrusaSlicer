@@ -50,9 +50,9 @@ jobs:
         run: |
             # Create zip file
 
-            ls -la ${{ github.workspace }}\deps
-            ls -la ${{ github.workspace }}\deps\build
-            ls -la ${{ github.workspace }}\deps\build\destdir\user\local
+            ls ${{ github.workspace }}\deps
+            ls ${{ github.workspace }}\deps\build
+            ls ${{ github.workspace }}\deps\build\destdir\user\local
 
             $date = Get-Date -Format "yyyyMMdd_HHmmss"
             $zipPath = "${{ github.workspace }}\deps\build\PrusaSlicer_deps_$date.zip"
