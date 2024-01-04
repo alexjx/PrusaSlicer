@@ -45,9 +45,21 @@ jobs:
           path: ${{ github.workspace }}/deps/build/destdir
           key: prusaslicer_deps_windows_2022
 
-      - name: Debug Deps
+      - name: Package Deps
+        working-directory: ${{ github.workspace }}
         run: |
-          dir ${{ github.workspace }}\deps\build\destdir\usr\local\lib
+            # Create zip file
+            $date = Get-Date -Format "yyyyMMdd_HHmmss"
+            $zipPath = "${{ github.workspace }}\deps\build\PrusaSlicer_deps_$date.zip"
+            Compress-Archive -Path "${{ github.workspace }}\deps\build\destdir\user\local\*" -DestinationPath $zipPath
+        shell: pwsh
+
+      - name: Upload Deps Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrusaSlicer_deps_win64_${{ github.run_number }}
+          path: ${{ github.workspace }}\deps\build\PrusaSlicer_deps_*
+          retention-days: 1
 
       - name: Build Slicer
         working-directory: ${{ github.workspace }}
