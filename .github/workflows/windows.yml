@@ -52,7 +52,7 @@ jobs:
 
             ls ${{ github.workspace }}\deps
             ls ${{ github.workspace }}\deps\build
-            ls ${{ github.workspace }}\deps\build\destdir\user\local
+            ls ${{ github.workspace }}\deps\build\destdir
 
             $date = Get-Date -Format "yyyyMMdd_HHmmss"
             $zipPath = "${{ github.workspace }}\deps\build\PrusaSlicer_deps_$date.zip"
