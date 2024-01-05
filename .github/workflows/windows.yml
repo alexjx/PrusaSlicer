@@ -21,6 +21,21 @@ jobs:
       - name: Setup MSVC Dev Cmd
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Set Version and Date
+        run: |
+          # Get Date
+          $date = Get-Date -Format "yyyyMMdd_HHmmss"
+
+          # Extract version info
+          $fileContent = Get-Content -Path "version.inc"
+          $pattern = 'set\(SLIC3R_VERSION "([^"]+)"\)'
+          $match = $fileContent | Select-String -Pattern $pattern -AllMatches
+          $version = $match.Matches[0].Groups[1].Value
+
+          echo "PS_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV -Encoding utf8
+          echo "PS_DATE=$date" | Out-File -Append -FilePath $env:GITHUB_ENV -Encoding utf8
+        shell: pwsh
+
       - name: Restore Deps Cache
         id: cache-deps
         uses: actions/cache@v3
@@ -71,38 +86,19 @@ jobs:
 
           # build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\build\destdir"
-          cmake --build . -j2 --config Release --target install
+          cmake --build . -j2 --config Release
 
           # debug
-          dir ${{ github.workspace }}\build\destdir
           dir ${{ github.workspace }}\build\src\Release
 
-      - name: Package Build
-        working-directory: ${{ github.workspace }}
-        run: |
-            $date = Get-Date -Format "yyyyMMdd_HHmmss"
-
-            # Extract version info
-            $fileContent = Get-Content -Path "version.inc"
-            $pattern = 'set\(SLIC3R_VERSION "([^"]+)"\)'
-            $match = $fileContent | Select-String -Pattern $pattern -AllMatches
-            $version = $match.Matches[0].Groups[1].Value
-            echo "PRUSASLICER_VERSION=$version" >> $GITHUB_ENV
-
-            # Copy dependency
-            Copy-Item -force ${{ github.workspace }}\deps\build\destdir\usr\local\bin\*.dll ${{ github.workspace }}\build\destdir
-            Move-Item -force ${{ github.workspace }}\build\destdir\bin\* ${{ github.workspace }}\build\destdir
-            Move-Item -force ${{ github.workspace }}\build\src\Release\*.exe ${{ github.workspace }}\build\destdir
-            Remove-Item ${{ github.workspace }}\build\destdir\bin
-
-            # Create zip file
-            $zipPath = "${{ github.workspace }}\build\PrusaSlicer_$version_$date.zip"
-            Compress-Archive -Path "${{ github.workspace }}\build\destdir\*" -DestinationPath $zipPath
+          # Remove unwanted
+          Remove-Item ${{ github.workspace }}\build\src\Release\*.lib
+          Remove-Item ${{ github.workspace }}\build\src\Release\*.pdb
         shell: pwsh
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: PrusaSlicer_${{ env.PRUSASLICER_VERSION }}_win64_${{ github.run_number }}
-          path: ${{ github.workspace }}\build\destdir
+          name: PrusaSlicer_${{ env.PS_VERSION }}_win64_${{ env.PS_DATE }}
+          path: ${{ github.workspace }}\build\src\Release\*
           retention-days: 1
