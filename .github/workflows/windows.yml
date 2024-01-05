@@ -65,16 +65,29 @@ jobs:
       - name: Build Slicer
         working-directory: ${{ github.workspace }}
         run: |
+          # make build dir
           mkdir ${{ github.workspace }}\build
           cd ${{ github.workspace }}\build
+
+          # build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}\deps\build\destdir\usr\local" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\build\destdir"
           cmake --build . -j2 --config Release --target install
+
+          # debug
           dir ${{ github.workspace }}\build\destdir
+          dir ${{ github.workspace }}\build\src\Release
 
       - name: Package Build
         working-directory: ${{ github.workspace }}
         run: |
             $date = Get-Date -Format "yyyyMMdd_HHmmss"
+
+            # Extract version info
+            $fileContent = Get-Content -Path "version.inc"
+            $pattern = 'set\(SLIC3R_VERSION "([^"]+)"\)'
+            $match = $fileContent | Select-String -Pattern $pattern -AllMatches
+            $version = $match.Matches[0].Groups[1].Value
+            echo "PRUSASLICER_VERSION=$version" >> $GITHUB_ENV
 
             # Copy dependency
             Copy-Item -force ${{ github.workspace }}\deps\build\destdir\usr\local\bin\*.dll ${{ github.workspace }}\build\destdir
@@ -83,13 +96,13 @@ jobs:
             Remove-Item ${{ github.workspace }}\build\destdir\bin
 
             # Create zip file
-            $zipPath = "${{ github.workspace }}\build\PrusaSlicer_$date.zip"
+            $zipPath = "${{ github.workspace }}\build\PrusaSlicer_$version_$date.zip"
             Compress-Archive -Path "${{ github.workspace }}\build\destdir\*" -DestinationPath $zipPath
         shell: pwsh
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: PrusaSlicer_win64_${{ github.run_number }}
+          name: PrusaSlicer_${{ env.PRUSASLICER_VERSION }}_win64_${{ github.run_number }}
           path: ${{ github.workspace }}\build\destdir
           retention-days: 1
